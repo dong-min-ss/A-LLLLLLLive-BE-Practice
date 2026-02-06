@@ -2,13 +2,14 @@ pipeline {
     agent any
     
     environment {
-        // AWS 계정 번호와 리전을 젠킨스 변수로 관리 (하드코딩 방지)
         AWS_ACCOUNT_ID = credentials('AWS_ACCOUNT_ID')
+        // IP 주소도 젠킨스에서 안전하게 가져오기
+        SERVER_IP      = credentials('BACKEND_SERVER_IP') 
+        
         AWS_REGION     = 'ap-northeast-2' 
         ECR_REGISTRY   = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         IMAGE_NAME     = 'olive-backend'
-        TAG            = "v${BUILD_NUMBER}" // 빌드 번호를 태그로 사용해 버전 자동 관리
-		    SERVER_IP      = '192.168.200.32' // 실제 운영 서버 IP로 변경
+        TAG            = "v${BUILD_NUMBER}"
     }
 
     stages {
