@@ -23,7 +23,7 @@ pipeline {
             steps {
                 // [체크!] 젠킨스에 등록한 AWS 키 ID와 일치해야 함
                 withAWS(credentials: 'aws-ecr-credentials', region: "${AWS_REGION}") {
-                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
+                    bat "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
                 }
             }
         }
