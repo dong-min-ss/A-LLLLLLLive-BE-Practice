@@ -3,7 +3,8 @@ kind: Deployment
 metadata:
   name: al7ive-be-deployment
 spec:
-  replicas: 2
+  replicas: 1
+
   selector:
     matchLabels:
       app: al7ive-be
