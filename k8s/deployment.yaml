@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: al7ive-be-deployment
+  labels:
+    app: al7ive-be
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: al7ive-be
+  template:
+    metadata:
+      labels:
+        app: al7ive-be
+    spec:
+      containers:
+      - name: al7ive-be
+        # 동민님이 방금 푸시한 ECR 이미지 주소입니다
+        image: 877009927021.dkr.ecr.ap-northeast-2.amazonaws.com/al7/ci-jenkins:latest
+        ports:
+        - containerPort: 8080
