@@ -2,23 +2,27 @@ pipeline {
     agent any
     
     environment {
-        AWS_ACCOUNT_ID = credentials('AWS_ACCOUNT_ID')
+        // [수정!] ECR 콘솔 우측 상단 12자리 숫자 직접 입력
+        AWS_ACCOUNT_ID = '877009927021' 
         AWS_REGION     = 'ap-northeast-2' 
+        // [수정!] 리포지토리 이름 직접 입력
+        ECR_REPO_NAME  = 'al7/ci-jenkins'
         ECR_REGISTRY   = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-        IMAGE_NAME     = "${env.ECR_REPO_NAME}"
         TAG            = "v${BUILD_NUMBER}"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                // SCM 설정(Git)에서 가져온 코드를 사용합니다
+                checkout scm 
             }
         }
 
         stage('AWS ECR Login') {
             steps {
-                withAWS(credentials: 'aws-credentials-id', region: "${AWS_REGION}") {
+                // [체크!] 젠킨스에 등록한 AWS 키 ID와 일치해야 함
+                withAWS(credentials: 'aws-ecr-credentials', region: "${AWS_REGION}") {
                     sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
                 }
             }
@@ -26,12 +30,12 @@ pipeline {
 
         stage('Build and Push') {
             steps {
-                // aL7ive 폴더로 이동해서 빌드 후 ECR로 바로 푸시
+                // aL7ive 폴더로 이동해서 Dockerfile을 찾습니다
                 dir('aL7ive') { 
-                    sh "docker build -t ${ECR_REGISTRY}/${IMAGE_NAME}:${TAG} ."
-                    sh "docker tag ${ECR_REGISTRY}/${IMAGE_NAME}:${TAG} ${ECR_REGISTRY}/${IMAGE_NAME}:latest"
-                    sh "docker push ${ECR_REGISTRY}/${IMAGE_NAME}:${TAG}"
-                    sh "docker push ${ECR_REGISTRY}/${IMAGE_NAME}:latest"
+                    sh "docker build -t ${ECR_REGISTRY}/${ECR_REPO_NAME}:${TAG} ."
+                    sh "docker tag ${ECR_REGISTRY}/${ECR_REPO_NAME}:${TAG} ${ECR_REGISTRY}/${ECR_REPO_NAME}:latest"
+                    sh "docker push ${ECR_REGISTRY}/${ECR_REPO_NAME}:${TAG}"
+                    sh "docker push ${ECR_REGISTRY}/${ECR_REPO_NAME}:latest"
                 }
             }
         }
